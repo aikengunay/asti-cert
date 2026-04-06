@@ -168,7 +168,7 @@ function exportPkcs12(keyPath, certPath, p12Path, password) {
 
 function showVersion() {
   try {
-    const pkgPath = path.join(__dirname, '..', 'package.json');
+    const pkgPath = path.join(__dirname, 'package.json');
     const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
     log(`asti-cert v${pkg.version}`, 'info');
   } catch (e) {

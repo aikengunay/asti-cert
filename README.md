@@ -27,11 +27,15 @@ npm install -g asti-cert
 npm install -g asti-cert
 ```
 
+The global command is **`asti-cert`** (same as the package name).
+
 ### From source
 
 ```bash
 git clone https://github.com/aikengunay/asti-cert.git
 cd asti-cert
+npm install
+chmod +x cli.js
 npm install -g .
 ```
 
@@ -39,6 +43,14 @@ npm install -g .
 
 - **Node.js** and **npm**
 - **OpenSSL** on your `PATH` (included on most macOS/Linux setups; on Windows use Git for Windows or install OpenSSL separately)
+
+## Privacy and security
+
+- **Runs locally.** Certificate material is generated on **your machine** using **OpenSSL**. Output files go only to the folder you specify; nothing is uploaded to this project, the author, or a third-party service by the CLI itself.
+- **No telemetry.** This tool does not send analytics, usage data, or your prompts (name, email, department, passwords) over the network.
+- **Installing from npm** downloads the package from the npm registry the same way as any other global CLI; that process is separate from generating certificates and does not transmit your keys or answers to this package’s code paths.
+
+Treat generated private keys and `.p12` files like any sensitive files: protect your device, use a strong password when you choose a custom one, and do not share or commit those artifacts.
 
 ## Usage
 
@@ -89,6 +101,27 @@ If you choose a **custom** password, it is **not** printed again after success�
 ```bash
 npm uninstall -g asti-cert
 ```
+
+## Publishing (maintainers)
+
+Package name on npm: **`asti-cert`** (unscoped). Global command: **`asti-cert`**.
+
+```bash
+npm login
+npm whoami
+npm publish
+# If 2FA is enabled:
+npm publish --otp=<code>
+```
+
+If `npm publish` fails with **404** on `PUT`:
+
+1. **Verify email** on [npmjs.com](https://www.npmjs.com/) account settings (unverified accounts often cannot publish).
+2. **2FA:** pass `--otp` when your account requires it.
+3. **Access tokens:** granular tokens must include **Publish** (not read-only).
+4. **Name taken:** the unscoped name `asti-cert` must be available on your npm account (or you need a different name).
+
+The CLI entrypoint is **`cli.js`** at the package root so npm’s packer keeps a valid `bin` link.
 
 ## License
 
