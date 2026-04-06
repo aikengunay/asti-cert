@@ -1,0 +1,35 @@
+{
+  "name": "asti-cert",
+  "version": "1.0.0",
+  "description": "Interactive CLI to create a self-signed DOST-ASTI digital certificate (.p12) for local signing workflows",
+  "main": "index.js",
+  "bin": {
+    "asti-cert": "./bin/asti-cert.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "asti",
+    "certificate",
+    "p12",
+    "pkcs12",
+    "openssl",
+    "self-signed",
+    "cli"
+  ],
+  "author": "Aiken Gunay",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aikengunay/asti-cert.git"
+  },
+  "bugs": {
+    "url": "https://github.com/aikengunay/asti-cert/issues"
+  },
+  "homepage": "https://github.com/aikengunay/asti-cert#readme",
+  "dependencies": {
+    "inquirer": "^8.2.6",
+    "chalk": "^4.1.2"
+  }
+}

@@ -1,0 +1,46 @@
+# Conventional Commits
+
+Always use conventional commit format for all git commits:
+
+## Format
+
+```
+<type>(<scope>): <subject>
+
+[optional body]
+
+[optional footer]
+```
+
+## Commit Types
+
+- `feat`: New feature
+- `fix`: Bug fix
+- `docs`: Documentation changes
+- `style`: Code style changes (formatting, whitespace, etc.)
+- `refactor`: Code refactoring without changing functionality
+- `test`: Adding or updating tests
+- `chore`: Maintenance tasks, dependency updates
+- `perf`: Performance improvements
+- `ci`: CI/CD configuration changes
+- `build`: Build system or external dependencies
+- `revert`: Reverting a previous commit
+
+## Scope (optional)
+
+Scope should be the area of the codebase affected:
+- `config`: Configuration changes
+- `cli`: CLI command changes
+- `openssl`: OpenSSL integration
+- `ui`: User interface/prompts
+- `security`: Security-related changes
+- `deps`: Dependencies
+
+## Guidelines
+
+- Use present tense ("add" not "added")
+- Use imperative mood ("fix bug" not "fixes bug")
+- Keep subject line under 72 characters
+- Capitalize first letter of subject
+- No period at end of subject line
+- Reference issues/PRs in footer: `Closes #123`
