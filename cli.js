@@ -55,6 +55,19 @@ function notAfterYmdFromDays(days) {
   return formatYmdLocal(end);
 }
 
+function highlightYmd(d) {
+  return chalk.bgYellow.black.bold(` ${d} `);
+}
+
+/** Prints: Valid from [date] to [date] (format: YYYY-MM-DD) — dates highlighted for visibility. */
+function printValidityFromTo(days, indent = '  ') {
+  const from = todayYmdLocal();
+  const to = notAfterYmdFromDays(days);
+  console.log(
+    `${indent}Valid from ${highlightYmd(from)} to ${highlightYmd(to)} ${chalk.dim('(format: YYYY-MM-DD)')}`
+  );
+}
+
 /** Default save location: user's Downloads folder (zip is written here; no extra subfolder). */
 function defaultOutputDirectory() {
   return path.join(os.homedir(), 'Downloads');
@@ -288,7 +301,7 @@ async function main() {
   // List `default` must be the choice index (not days). 3650 was out of range, so Enter wrongly picked 1 year.
   const validityChoices = [
     ...VALIDITY_PRESETS.map((p) => ({
-      name: `${p.name} — not after ${notAfterYmdFromDays(p.days)} (yyyy-mm-dd)`,
+      name: `${p.name} · would expire on ${notAfterYmdFromDays(p.days)}`,
       value: p.days,
     })),
     { name: 'Custom (enter days)', value: 'custom' },
@@ -300,7 +313,7 @@ async function main() {
       type: 'list',
       name: 'validityChoice',
       message:
-        'Certificate validity — not-after dates are calendar estimates in yyyy-mm-dd (local); default: 10 years (↑/↓, Enter):',
+        'How long should this certificate last? (Each option shows the expiry date. Default is 10 years — ↑/↓ then Enter):',
       choices: validityChoices,
       default: defaultValidityIndex >= 0 ? defaultValidityIndex : 0,
     },
@@ -312,7 +325,7 @@ async function main() {
       {
         type: 'input',
         name: 'days',
-        message: 'Validity in days (1–36500); not-after will be shown as yyyy-mm-dd:',
+        message: 'How many days should this certificate last? (1–36500):',
         validate: (input) => {
           const n = parseInt(String(input).trim(), 10);
           if (Number.isNaN(n) || n < 1 || n > 36500) {
@@ -325,10 +338,7 @@ async function main() {
     validityDays = parseInt(String(days).trim(), 10);
   }
 
-  log(
-    `  Validity window (estimate): valid from ${todayYmdLocal()} through ${notAfterYmdFromDays(validityDays)} (yyyy-mm-dd)`,
-    'info'
-  );
+  printValidityFromTo(validityDays);
 
   const { outDir } = await inquirer.prompt([
     {
@@ -390,10 +400,8 @@ async function main() {
 
   log('\n--- Summary ---', 'info');
   log(`Subject: ${subject}`, 'info');
-  log(
-    `Validity: ${validityDays} days — not after ${notAfterYmdFromDays(validityDays)} (yyyy-mm-dd); valid from ${todayYmdLocal()} (yyyy-mm-dd)`,
-    'info'
-  );
+  log(`Validity: ${validityDays} days`, 'info');
+  printValidityFromTo(validityDays);
   log(`Output directory: ${resolvedOut}`, 'info');
   log(
     `Files (will be bundled into ${baseName}.zip): ${baseName}.pkey, ${baseName}.csr, ${baseName}.cer, ${baseName}.p12`,
@@ -463,10 +471,7 @@ async function main() {
   log('Your certificate bundle:', 'info');
   log(`  ${chalk.green.bold(zipPath)}`, 'success');
   log('  Extract the .zip when you need the files. Import the .p12 for signing (after extract).', 'info');
-  log(
-    `  Valid from ${todayYmdLocal()} — expires (not after) ${notAfterYmdFromDays(validityDays)} (yyyy-mm-dd, local calendar estimate)`,
-    'info'
-  );
+  printValidityFromTo(validityDays);
 
   log('\nUpload in ASTI ERP (open in your browser):', 'info');
   log(`  ${chalk.cyan(ERP_PKI_UPLOAD_URL)}`, 'info');

@@ -58,7 +58,7 @@ Treat generated private keys and `.p12` files like any sensitive files: protect 
 asti-cert
 ```
 
-Follow the prompts for full name, department, email (`@asti.dost.gov.ph`), validity, output folder, and `.p12` password. Validity prompts show valid-from and not-after dates in `yyyy-mm-dd` (local calendar) so you can see when the certificate expires; OpenSSL’s actual `notBefore`/`notAfter` may differ slightly by time-of-day.
+Follow the prompts for full name, department, email (`@asti.dost.gov.ph`), validity, output folder, and `.p12` password. The tool prints `Valid from … to …` with both dates highlighted in the terminal, then `(format: YYYY-MM-DD)`.
 
 **Examples:**
 
