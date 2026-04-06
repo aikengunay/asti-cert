@@ -9,6 +9,7 @@ const chalk = require('chalk');
 const AdmZip = require('adm-zip');
 
 const DOMAIN = '@asti.dost.gov.ph';
+const ERP_PKI_UPLOAD_URL = 'https://erp.asti.dost.gov.ph/index.php?r=pmis/er/pki';
 const DEFAULT_P12_PASSWORD = 'password';
 const MIN_CUSTOM_PASSWORD_LENGTH = 8;
 
@@ -34,6 +35,25 @@ const VALIDITY_PRESETS = [
   { name: '5 years (1825 days)', days: 1825 },
   { name: '10 years (3650 days) — default', days: 3650 },
 ];
+
+/** Format a Date as yyyy-mm-dd in local timezone. */
+function formatYmdLocal(date) {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
+
+function todayYmdLocal() {
+  return formatYmdLocal(new Date());
+}
+
+/** Approximate not-after date (calendar) if the cert is issued today: today + days. */
+function notAfterYmdFromDays(days) {
+  const end = new Date();
+  end.setDate(end.getDate() + Number(days));
+  return formatYmdLocal(end);
+}
 
 /** Default save location: user's Downloads folder (zip is written here; no extra subfolder). */
 function defaultOutputDirectory() {
@@ -267,7 +287,10 @@ async function main() {
 
   // List `default` must be the choice index (not days). 3650 was out of range, so Enter wrongly picked 1 year.
   const validityChoices = [
-    ...VALIDITY_PRESETS.map((p) => ({ name: p.name, value: p.days })),
+    ...VALIDITY_PRESETS.map((p) => ({
+      name: `${p.name} — not after ${notAfterYmdFromDays(p.days)} (yyyy-mm-dd)`,
+      value: p.days,
+    })),
     { name: 'Custom (enter days)', value: 'custom' },
   ];
   const defaultValidityIndex = VALIDITY_PRESETS.findIndex((p) => p.days === 3650);
@@ -276,7 +299,8 @@ async function main() {
     {
       type: 'list',
       name: 'validityChoice',
-      message: 'Certificate validity (default: 10 years — ↑/↓ to change, Enter to choose):',
+      message:
+        'Certificate validity — not-after dates are calendar estimates in yyyy-mm-dd (local); default: 10 years (↑/↓, Enter):',
       choices: validityChoices,
       default: defaultValidityIndex >= 0 ? defaultValidityIndex : 0,
     },
@@ -288,7 +312,7 @@ async function main() {
       {
         type: 'input',
         name: 'days',
-        message: 'Validity in days (1–36500):',
+        message: 'Validity in days (1–36500); not-after will be shown as yyyy-mm-dd:',
         validate: (input) => {
           const n = parseInt(String(input).trim(), 10);
           if (Number.isNaN(n) || n < 1 || n > 36500) {
@@ -300,6 +324,11 @@ async function main() {
     ]);
     validityDays = parseInt(String(days).trim(), 10);
   }
+
+  log(
+    `  Validity window (estimate): valid from ${todayYmdLocal()} through ${notAfterYmdFromDays(validityDays)} (yyyy-mm-dd)`,
+    'info'
+  );
 
   const { outDir } = await inquirer.prompt([
     {
@@ -361,7 +390,10 @@ async function main() {
 
   log('\n--- Summary ---', 'info');
   log(`Subject: ${subject}`, 'info');
-  log(`Validity: ${validityDays} days`, 'info');
+  log(
+    `Validity: ${validityDays} days — not after ${notAfterYmdFromDays(validityDays)} (yyyy-mm-dd); valid from ${todayYmdLocal()} (yyyy-mm-dd)`,
+    'info'
+  );
   log(`Output directory: ${resolvedOut}`, 'info');
   log(
     `Files (will be bundled into ${baseName}.zip): ${baseName}.pkey, ${baseName}.csr, ${baseName}.cer, ${baseName}.p12`,
@@ -431,6 +463,11 @@ async function main() {
   log('Your certificate bundle:', 'info');
   log(`  ${chalk.green.bold(zipPath)}`, 'success');
   log('  Extract the .zip when you need the files. Import the .p12 for signing (after extract).', 'info');
+
+  log('\nUpload in ASTI ERP (open in your browser):', 'info');
+  log(`  ${chalk.cyan(ERP_PKI_UPLOAD_URL)}`, 'info');
+  log('  Sign in first if prompted; you cannot upload until you are logged in.', 'info');
+  log('  In the app: ERP > Settings > Upload Digital Certificate', 'info');
 
   if (useDefaultPassword) {
     log(`\nYour .p12 was created with the default password: ${chalk.bold(DEFAULT_P12_PASSWORD)}`, 'warning');

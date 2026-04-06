@@ -58,7 +58,7 @@ Treat generated private keys and `.p12` files like any sensitive files: protect 
 asti-cert
 ```
 
-Follow the prompts for full name, department, email (`@asti.dost.gov.ph`), validity, output folder, and `.p12` password.
+Follow the prompts for full name, department, email (`@asti.dost.gov.ph`), validity, output folder, and `.p12` password. Validity prompts show valid-from and not-after dates in `yyyy-mm-dd` (local calendar) so you can see when the certificate expires; OpenSSL’s actual `notBefore`/`notAfter` may differ slightly by time-of-day.
 
 **Examples:**
 
@@ -84,6 +84,8 @@ In your chosen output folder (default: **`Downloads`** — e.g. `~/Downloads` on
 If you choose the **default** onboarding option, the PKCS#12 password is the literal word **`password`**, matching common internal onboarding text. After creation, the CLI prints this again so you can import immediately. **Back up** the zip (or the extracted `.p12`); you can change the password after import in your operating system or application.
 
 If you choose a **custom** password, it is **not** printed again after success—store it safely.
+
+After a successful run, the CLI prints the ASTI ERP link to upload your digital certificate (`https://erp.asti.dost.gov.ph/index.php?r=pmis/er/pki`). You must be logged in to ERP (otherwise you will see the login page first). In the UI the path is: ERP > Settings > Upload Digital Certificate.
 
 ## Fixed fields (DOST-ASTI v1)
 
