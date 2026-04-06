@@ -1,6 +1,6 @@
 {
   "name": "asti-cert",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "Interactive CLI to create a self-signed DOST-ASTI digital certificate (.p12) for local signing workflows",
   "main": "index.js",
   "files": [
@@ -34,6 +34,7 @@
   },
   "homepage": "https://github.com/aikengunay/asti-cert#readme",
   "dependencies": {
+    "adm-zip": "^0.5.16",
     "inquirer": "^8.2.6",
     "chalk": "^4.1.2"
   }

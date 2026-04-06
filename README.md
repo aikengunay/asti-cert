@@ -70,10 +70,10 @@ asti-cert --help
 
 ## What it creates
 
-In your chosen output folder (default: **`Downloads/digital_cert`** under your user profile — e.g. `~/Downloads/digital_cert` on macOS/Linux, `%USERPROFILE%\Downloads\digital_cert` on Windows), files are named with your name and a timestamp. If your system uses a localized or custom Downloads location, type that full path at the prompt.
+In your chosen output folder (default: **`Downloads/digital_cert`** under your user profile — e.g. `~/Downloads/digital_cert` on macOS/Linux, `%USERPROFILE%\Downloads\digital_cert` on Windows), the CLI writes a **single ZIP file** named with your name and a timestamp (e.g. `YourName-2026-04-06-143052.zip`). Inside the archive are the four certificate files below; **extract the zip** before using them. The loose files are removed after zipping so you only move one file. If your system uses a localized or custom Downloads location, type that full path at the prompt.
 
-| File | Purpose |
-|------|--------|
+| File (inside the `.zip`) | Purpose |
+|--------------------------|--------|
 | `.pkey` | Private key (keep secret) |
 | `.csr` | Certificate signing request |
 | `.cer` | Self-signed certificate |
@@ -81,7 +81,7 @@ In your chosen output folder (default: **`Downloads/digital_cert`** under your u
 
 ### Default `.p12` password
 
-If you choose the **default** onboarding option, the PKCS#12 password is the literal word **`password`**, matching common internal onboarding text. After creation, the CLI prints this again so you can import immediately. **Back up** your `.p12`; you can change the password after import in your operating system or application.
+If you choose the **default** onboarding option, the PKCS#12 password is the literal word **`password`**, matching common internal onboarding text. After creation, the CLI prints this again so you can import immediately. **Back up** the zip (or the extracted `.p12`); you can change the password after import in your operating system or application.
 
 If you choose a **custom** password, it is **not** printed again after success—store it safely.
 

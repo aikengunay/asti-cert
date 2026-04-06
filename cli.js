@@ -6,6 +6,7 @@ const os = require('os');
 const path = require('path');
 const inquirer = require('inquirer');
 const chalk = require('chalk');
+const AdmZip = require('adm-zip');
 
 const DOMAIN = '@asti.dost.gov.ph';
 const DEFAULT_P12_PASSWORD = 'password';
@@ -124,6 +125,24 @@ function runOpenSSL(args, options = {}) {
     throw new Error(err);
   }
   return r;
+}
+
+/** Pack .pkey, .csr, .cer, .p12 into one .zip, then delete the loose files (only the zip remains). */
+function zipCertArtifactsAndRemoveLoose(paths, zipPath) {
+  const zip = new AdmZip();
+  for (const p of paths) {
+    if (!fs.existsSync(p)) {
+      throw new Error(`Missing file before zip: ${p}`);
+    }
+    zip.addLocalFile(p, '', path.basename(p));
+  }
+  zip.writeZip(zipPath);
+  if (!fs.existsSync(zipPath) || fs.statSync(zipPath).size === 0) {
+    throw new Error('ZIP archive was not written correctly');
+  }
+  for (const p of paths) {
+    fs.unlinkSync(p);
+  }
 }
 
 function exportPkcs12(keyPath, certPath, p12Path, password) {
@@ -344,7 +363,10 @@ async function main() {
   log(`Subject: ${subject}`, 'info');
   log(`Validity: ${validityDays} days`, 'info');
   log(`Output directory: ${resolvedOut}`, 'info');
-  log(`Files: ${baseName}.pkey, ${baseName}.csr, ${baseName}.cer, ${baseName}.p12`, 'info');
+  log(
+    `Files (will be bundled into ${baseName}.zip): ${baseName}.pkey, ${baseName}.csr, ${baseName}.cer, ${baseName}.p12`,
+    'info'
+  );
 
   const { proceed } = await inquirer.prompt([
     {
@@ -372,6 +394,8 @@ async function main() {
   const csrPath = path.join(resolvedOut, `${baseName}.csr`);
   const cerPath = path.join(resolvedOut, `${baseName}.cer`);
   const p12Path = path.join(resolvedOut, `${baseName}.p12`);
+  const zipPath = path.join(resolvedOut, `${baseName}.zip`);
+  const loosePaths = [keyPath, csrPath, cerPath, p12Path];
 
   try {
     runOpenSSL(['genpkey', '-algorithm', 'RSA', '-pkeyopt', 'rsa_keygen_bits:2048', '-out', keyPath]);
@@ -396,16 +420,17 @@ async function main() {
 
     exportPkcs12(keyPath, cerPath, p12Path, p12Password);
     success(`✓ PKCS#12 written: ${p12Path}`);
+
+    zipCertArtifactsAndRemoveLoose(loosePaths, zipPath);
+    success(`✓ ZIP bundle created (loose files removed): ${zipPath}`);
   } catch (e) {
-    error(`OpenSSL failed: ${e.message}`);
+    error(e instanceof Error ? e.message : String(e));
   }
 
   log('\n=== Done ===\n', 'success');
-  log('Files created:', 'info');
-  log(`  Private key:  ${keyPath}`, 'info');
-  log(`  CSR:          ${csrPath}`, 'info');
-  log(`  Certificate:  ${cerPath}`, 'info');
-  log(`  ${chalk.green.bold('Import this for signing:')} ${p12Path}`, 'success');
+  log('Your certificate bundle:', 'info');
+  log(`  ${chalk.green.bold(zipPath)}`, 'success');
+  log('  Extract the .zip when you need the files. Import the .p12 for signing (after extract).', 'info');
 
   if (useDefaultPassword) {
     log(`\nYour .p12 was created with the default password: ${chalk.bold(DEFAULT_P12_PASSWORD)}`, 'warning');
