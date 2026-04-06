@@ -70,7 +70,7 @@ asti-cert --help
 
 ## What it creates
 
-In your chosen output folder (default: **`Downloads/digital_cert`** under your user profile — e.g. `~/Downloads/digital_cert` on macOS/Linux, `%USERPROFILE%\Downloads\digital_cert` on Windows), the CLI writes a **single ZIP file** named with your name and a timestamp (e.g. `YourName-2026-04-06-143052.zip`). Inside the archive are the four certificate files below; **extract the zip** before using them. The loose files are removed after zipping so you only move one file. If your system uses a localized or custom Downloads location, type that full path at the prompt.
+In your chosen output folder (default: **`Downloads`** — e.g. `~/Downloads` on macOS/Linux, `%USERPROFILE%\Downloads` on Windows), the CLI writes **only a ZIP file** named with your name and a timestamp (e.g. `YourName-2026-04-06-143052.zip`). It does not create a separate `digital_cert` subfolder by default. Inside the archive are the four certificate files below; **extract the zip** before using them. Temporary loose files are removed after zipping. If your system uses a localized or custom Downloads location, type that full path at the prompt.
 
 | File (inside the `.zip`) | Purpose |
 |--------------------------|--------|

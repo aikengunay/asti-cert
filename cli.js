@@ -35,9 +35,9 @@ const VALIDITY_PRESETS = [
   { name: '10 years (3650 days) — default', days: 3650 },
 ];
 
-/** Default save location: Downloads/digital_cert under the user's home (Windows, macOS, Linux). */
+/** Default save location: user's Downloads folder (zip is written here; no extra subfolder). */
 function defaultOutputDirectory() {
-  return path.join(os.homedir(), 'Downloads', 'digital_cert');
+  return path.join(os.homedir(), 'Downloads');
 }
 
 function log(message, type = 'info') {
