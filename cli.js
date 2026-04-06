@@ -34,6 +34,11 @@ const VALIDITY_PRESETS = [
   { name: '10 years (3650 days) — default', days: 3650 },
 ];
 
+/** Default save location: Downloads/digital_cert under the user's home (Windows, macOS, Linux). */
+function defaultOutputDirectory() {
+  return path.join(os.homedir(), 'Downloads', 'digital_cert');
+}
+
 function log(message, type = 'info') {
   const colors = {
     info: chalk.blue,
@@ -222,7 +227,7 @@ async function main() {
     {
       type: 'list',
       name: 'department',
-      message: 'Department / division:',
+      message: 'Department / division (↑/↓ then Enter):',
       choices: DEPARTMENTS,
     },
   ]);
@@ -241,16 +246,20 @@ async function main() {
 
   const { email } = normalizeEmail(emailInput);
 
+  // List `default` must be the choice index (not days). 3650 was out of range, so Enter wrongly picked 1 year.
+  const validityChoices = [
+    ...VALIDITY_PRESETS.map((p) => ({ name: p.name, value: p.days })),
+    { name: 'Custom (enter days)', value: 'custom' },
+  ];
+  const defaultValidityIndex = VALIDITY_PRESETS.findIndex((p) => p.days === 3650);
+
   const { validityChoice } = await inquirer.prompt([
     {
       type: 'list',
       name: 'validityChoice',
-      message: 'Certificate validity:',
-      choices: [
-        ...VALIDITY_PRESETS.map((p) => ({ name: p.name, value: p.days })),
-        { name: 'Custom (enter days)', value: 'custom' },
-      ],
-      default: 3650,
+      message: 'Certificate validity (default: 10 years — ↑/↓ to change, Enter to choose):',
+      choices: validityChoices,
+      default: defaultValidityIndex >= 0 ? defaultValidityIndex : 0,
     },
   ]);
 
@@ -260,7 +269,7 @@ async function main() {
       {
         type: 'input',
         name: 'days',
-        message: 'Validity in days:',
+        message: 'Validity in days (1–36500):',
         validate: (input) => {
           const n = parseInt(String(input).trim(), 10);
           if (Number.isNaN(n) || n < 1 || n > 36500) {
@@ -278,18 +287,25 @@ async function main() {
       type: 'input',
       name: 'outDir',
       message: 'Output directory:',
-      default: path.join(process.cwd(), 'digital_cert'),
+      default: defaultOutputDirectory(),
     },
   ]);
 
-  const resolvedOut = path.resolve(String(outDir).trim() || path.join(process.cwd(), 'digital_cert'));
+  const resolvedOut = path.resolve(String(outDir).trim() || defaultOutputDirectory());
 
   const { useDefaultPassword } = await inquirer.prompt([
     {
-      type: 'confirm',
+      type: 'list',
       name: 'useDefaultPassword',
-      message: `Use default .p12 password "${DEFAULT_P12_PASSWORD}" (same as legacy onboarding)?`,
-      default: true,
+      message: 'PKCS#12 password (Press Enter to accept the highlighted option):',
+      choices: [
+        {
+          name: `Use default password "${DEFAULT_P12_PASSWORD}" (legacy onboarding)`,
+          value: true,
+        },
+        { name: 'Set a custom password', value: false },
+      ],
+      default: 0,
     },
   ]);
 
@@ -332,10 +348,14 @@ async function main() {
 
   const { proceed } = await inquirer.prompt([
     {
-      type: 'confirm',
+      type: 'list',
       name: 'proceed',
-      message: 'Create certificate files now?',
-      default: true,
+      message: 'Create certificate files now? (Press Enter to accept the highlighted option):',
+      choices: [
+        { name: 'Yes, create files', value: true },
+        { name: 'No, cancel', value: false },
+      ],
+      default: 0,
     },
   ]);
 

@@ -70,7 +70,7 @@ asti-cert --help
 
 ## What it creates
 
-In your chosen output folder (default: `./digital_cert`), files are named with your name and a timestamp:
+In your chosen output folder (default: **`Downloads/digital_cert`** under your user profile — e.g. `~/Downloads/digital_cert` on macOS/Linux, `%USERPROFILE%\Downloads\digital_cert` on Windows), files are named with your name and a timestamp. If your system uses a localized or custom Downloads location, type that full path at the prompt.
 
 | File | Purpose |
 |------|--------|
