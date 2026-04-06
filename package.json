@@ -1,6 +1,6 @@
 {
   "name": "asti-cert",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "description": "Interactive CLI to create a self-signed DOST-ASTI digital certificate (.p12) for local signing workflows",
   "main": "index.js",
   "files": [

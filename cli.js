@@ -463,6 +463,10 @@ async function main() {
   log('Your certificate bundle:', 'info');
   log(`  ${chalk.green.bold(zipPath)}`, 'success');
   log('  Extract the .zip when you need the files. Import the .p12 for signing (after extract).', 'info');
+  log(
+    `  Valid from ${todayYmdLocal()} — expires (not after) ${notAfterYmdFromDays(validityDays)} (yyyy-mm-dd, local calendar estimate)`,
+    'info'
+  );
 
   log('\nUpload in ASTI ERP (open in your browser):', 'info');
   log(`  ${chalk.cyan(ERP_PKI_UPLOAD_URL)}`, 'info');
